@@ -1,0 +1,73 @@
+{
+  "schema": "llm-gateway-comparison-v1",
+  "updated": "2026-09-17",
+  "note": "Rows describe gateway ARCHETYPES, not vendor scorecards. Named products are listed as examples of the archetype only; verify every cell against the vendor's own documentation for your account before relying on it.",
+  "dimensions": [
+    {"id": "keys", "label": "Credential model", "question": "How many keys does the caller manage?"},
+    {"id": "envelope", "label": "Response normalisation", "question": "Is the response shape normalised across providers?"},
+    {"id": "billing", "label": "Billing unit", "question": "Which unit does the caller pay in?"},
+    {"id": "idempotency", "label": "Retry safety", "question": "Is there an idempotency mechanism for submit retries?"},
+    {"id": "timeout", "label": "Timeout control", "question": "Can the caller set request and job TTLs?"},
+    {"id": "observability", "label": "Observability", "question": "What is exposed per request?"},
+    {"id": "selfhost", "label": "Self-hostable", "question": "Can it run inside your own infrastructure?"},
+    {"id": "ops", "label": "Ops burden", "question": "Who runs upgrades, scaling and incident response?"}
+  ],
+  "archetypes": [
+    {
+      "id": "self-hosted-oss",
+      "label": "Self-hosted open-source gateway",
+      "examples": ["LiteLLM proxy", "one-api / new-api", "Apache APISIX AI plugins", "Kong AI Gateway"],
+      "keys": "you hold every provider key",
+      "envelope": "normalised by your configuration",
+      "billing": "provider units (plus your own infra cost)",
+      "idempotency": "you implement it",
+      "timeout": "full control",
+      "observability": "whatever you instrument",
+      "selfhost": "yes",
+      "ops": "your team",
+      "scores": {"control": 5, "cost_transparency": 3, "setup_effort": 1, "ops_burden": 5}
+    },
+    {
+      "id": "managed-gateway",
+      "label": "Managed gateway / control plane",
+      "examples": ["managed AI gateway products with policy dashboards"],
+      "keys": "one gateway key; provider keys stored upstream",
+      "envelope": "normalised, versioned by the vendor",
+      "billing": "provider units plus a gateway fee",
+      "idempotency": "vendor feature, verify semantics",
+      "timeout": "policy-level settings",
+      "observability": "dashboard, logs, sometimes traces",
+      "selfhost": "no",
+      "ops": "vendor",
+      "scores": {"control": 3, "cost_transparency": 3, "setup_effort": 4, "ops_burden": 2}
+    },
+    {
+      "id": "relayed-per-unit",
+      "label": "Relayed per-unit route",
+      "examples": ["per-image, per-second and per-token relay routes"],
+      "keys": "one key, provider relationship managed for you",
+      "envelope": "normalised with an async task model",
+      "billing": "flat per image / per second / per token",
+      "idempotency": "header-driven (Idempotency-Key)",
+      "timeout": "request timeout plus task TTL",
+      "observability": "per-task status, progress, cost and credits",
+      "selfhost": "no",
+      "ops": "vendor",
+      "scores": {"control": 2, "cost_transparency": 5, "setup_effort": 5, "ops_burden": 1}
+    },
+    {
+      "id": "direct-vendor",
+      "label": "Direct vendor API",
+      "examples": ["first-party model vendor endpoints"],
+      "keys": "one key per vendor",
+      "envelope": "vendor-specific",
+      "billing": "vendor units (often tokens)",
+      "idempotency": "per vendor, often absent on generation endpoints",
+      "timeout": "per vendor",
+      "observability": "vendor console",
+      "selfhost": "no",
+      "ops": "vendor",
+      "scores": {"control": 3, "cost_transparency": 2, "setup_effort": 3, "ops_burden": 2}
+    }
+  ]
+}

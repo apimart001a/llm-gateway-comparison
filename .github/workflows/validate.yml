@@ -1,0 +1,21 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Attribution check
+        run: python tools/check_links.py
+      - name: Smoke-test the comparison script
+        run: |
+          python tools/compare.py --show > /dev/null
+          python tools/compare.py --weight control=3 --weight cost_transparency=3 --weight ops_burden=1
