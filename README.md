@@ -1,10 +1,27 @@
 # LLM Gateway Comparison — A Reproducible Way to Choose
 
+<!-- conv-kit:v1 -->
+
+<p align="center">
+  <img src="assets/badges/price.svg" alt="observed unit price"> <img src="assets/badges/billing.svg" alt="billing model"> <img src="assets/badges/compat.svg" alt="OpenAI-compatible endpoint">
+</p>
+
+> **image2.5 from $0.0085 per 1K image** · Seedance 2.5 from $0.0961/sec · cached LLM input from $0.40/M — one OpenAI-compatible endpoint at `https://api.apimart.ai/v1`, no monthly plan required. *(observed 2026-09-17)*
+
+**[Get an API key](https://go.apimart.ai/k-95b075)** · **[Live pricing](https://go.apimart.ai/k-9f4ab7)** · **[Model page](https://go.apimart.ai/k-dda2cc)**
+
+**Why teams route through APIMart**
+
+- **One key, entire catalog.** The same `https://api.apimart.ai/v1` base URL and `Authorization` header reach the whole catalog behind one key and 300+ other image, video and language models — switch the `model` field, not your client.
+- **$1 minimum, pay as you go.** No subscription and no prepaid plan to size up front: top up from $1 and spend it on calls. There is no free quota to burn through first, so the price in this table is the price you pay.
+- **The charge comes back in the response.** Every call reports the amount billed (`cost` / `credits_cost`), so a spend number is read per call instead of guessed at month end.
+- **Async by design.** Submit, take the `task_id`, poll `GET /v1/tasks/{id}` — batching and retries are ordinary queue work, not a bespoke integration.
+
+<!-- /conv-kit:v1 -->
+
 **LLM gateway comparison** without the marketing table: pick the dimensions that matter to you, weight them, and score
 the four gateway archetypes (self-hosted open source, managed control plane, relayed per-unit route, direct vendor API)
 with a script you can rerun when your requirements change.
-
-**Attributed entry points:** [Browse the model catalog](https://go.apimart.ai/k-dda2cc) · [Current pricing](https://go.apimart.ai/k-9f4ab7) · [Get an API key](https://go.apimart.ai/k-95b075)
 
 ## Why archetypes instead of a vendor scorecard
 
@@ -47,6 +64,32 @@ python tools/compare.py --weight control=3 --weight cost_transparency=3 \
   with an SRE rotation should reach different conclusions from the same matrix.
 - It is not a benchmark. Latency and price numbers belong in your own run, on your own prompts.
 
+
+<!-- conv-kit:v1:scale -->
+### What that costs at scale
+
+| Workload | Cost at the observed rates |
+| --- | --- |
+| 1,000 GPT Image 2.5 renders (1K) | $8.50 |
+| 10 minutes of Seedance 2.5 at 480P (600s) | $57.66 |
+| 1M cached LLM input tokens | from $0.40 |
+
+Linear at the observed per-unit rate, no volume discount assumed. Snapshot 2026-09-17; re-check the live table before committing a budget.
+<!-- /conv-kit:v1:scale -->
+
+<!-- conv-kit:v1:fix -->
+## First-call troubleshooting
+
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| `401` / `invalid api key` | key missing, truncated, or a stray newline pasted into the header | Re-copy it from the console; the header is `Authorization: Bearer $APIMART_API_KEY` |
+| balance / credit error | the account has no balance | Top up from $1 in the console — there is no free quota to fall back on |
+| `429` | concurrent requests on one key | Back off, then retry the same request with the same `Idempotency-Key` |
+| `400` / model not found | wrong route for the id: the per-unit alias needs its `version`, the official id must not send one | Copy the exact `model` value from the route table above |
+| task ends `failed` | prompt rejected by the filter, or a reference image URL expired | Re-submit with a **new** `Idempotency-Key` and re-host the reference image |
+| result URL stops working | result links expire | Download the file as soon as the task reports `completed` |
+<!-- /conv-kit:v1:fix -->
+
 ## Related searches
 
 - `llm gateway comparison`
@@ -56,6 +99,12 @@ python tools/compare.py --weight control=3 --weight cost_transparency=3 \
 - `ai api aggregator`
 - `openai compatible api`
 - `ai api pricing comparison`
+
+<!-- conv-kit:v1:cta -->
+---
+
+**Start with $1.** [Get an API key](https://go.apimart.ai/k-95b075) → [check live pricing](https://go.apimart.ai/k-9f4ab7) → [open the whole catalog behind one key in the model library](https://go.apimart.ai/k-dda2cc). The first call is three steps: submit, poll `task_id`, read the charged amount off the response.
+<!-- /conv-kit:v1:cta -->
 
 ## Attributed links (how this repository is measured)
 
